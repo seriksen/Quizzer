@@ -2,11 +2,12 @@ import tkinter as tk  # python 3
 from tkinter import font as tkfont  # python 3
 import numpy as np
 from tkinter import messagebox
+import os
 
 
 class CreateQuizGUI(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, questions, answers, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
         self.title_font = tkfont.Font(family='Helvetica', size=25, weight="bold", slant="italic")
@@ -24,7 +25,7 @@ class CreateQuizGUI(tk.Tk):
 
         frame.grid(row=0, column=0, sticky="nsew")
 
-        for i in np.arange(1, 5, 1):
+        for i in np.arange(1, len(questions) + 1, 1):
             page_name = "Page_" + str(i)
             next_name = "Page_" + str(i + 1)
             if i - 1 == 0:
@@ -32,12 +33,9 @@ class CreateQuizGUI(tk.Tk):
             else:
                 back_name = "Page_" + str(i - 1)
             frame = QuestionPage(parent=container, controller=self, next_name=next_name, back_name=back_name,
-                                  question="Question " + str(i), answer="Question " + str(i) + " Answer")
+                                 title="Question " + str(i) + " of " + str(len(questions)), question=questions[i - 1], answer=answers[i - 1])
             self.frames[page_name] = frame
 
-            # put all of the pages in the same location;
-            # the one on the top of the stacking order
-            # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("StartPage")
@@ -53,7 +51,7 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Welcome to the quiz!", font=controller.title_font)
+        label = tk.Label(self, text="Welcome to Quizzer!", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
         button1 = tk.Button(self, text="Begin the quiz",
@@ -63,11 +61,14 @@ class StartPage(tk.Frame):
 
 class QuestionPage(tk.Frame):
 
-    def __init__(self, parent, controller, back_name, next_name, question, answer):
+    def __init__(self, parent, controller, back_name, next_name, title, question, answer):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.title = title
         self.question = question
         self.answer = answer
+        title_label = tk.Label(self, text=title)
+        title_label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
         label = tk.Label(self, text=question, font=controller.title_font)
         label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
         back_button = tk.Button(self, text="Go back",
@@ -79,11 +80,7 @@ class QuestionPage(tk.Frame):
             tk.messagebox.showinfo(self.question, self.answer)
 
         answer_button = tk.Button(self, text="Show Answer", command=show_answer)
-        answer_button.pack(side="top", fill="both", expand=True, padx=0, pady=0)
-        back_button.pack(side="top", fill="both", expand=True, padx=0, pady=0)
-        next_button.pack(side="top", fill="both", expand=True, padx=0, pady=0)
+        answer_button.pack(side="top",fill='both', expand=True, padx=0, pady=0)
+        back_button.pack(side="left", expand=True, padx=0, pady=0)
+        next_button.pack(side="left", expand=True, padx=0, pady=0)
 
-
-if __name__ == "__main__":
-    app = CreateQuizGUI()
-    app.mainloop()
