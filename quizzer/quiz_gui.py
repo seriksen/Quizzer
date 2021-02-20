@@ -93,6 +93,8 @@ else:
             tk.Tk.__init__(self, *args, **kwargs)
 
             self.title_font = tkfont.Font(family='Helvetica', size=25, weight="bold", slant="italic")
+            self.question_font = tkfont.Font(family='Arial', size=35, weight="bold")
+            self.answer_font = tkfont.Font(family='Arial', size=35, weight="normal")
             self.geometry("500x300")
             container = tk.Frame(self)
             container.pack(side="top", fill="both", expand=True)
@@ -104,12 +106,12 @@ else:
             page_name = StartPage.__name__
             frame = StartPage(parent=container, controller=self)
             self.frames[page_name] = frame
-
             frame.grid(row=0, column=0, sticky="nsew")
 
             page_name = EndPage.__name__
             frame = EndPage(parent=container, controller=self)
             self.frames[page_name] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
 
             for i in np.arange(1, len(questions) + 1, 1):
                 page_name = "Question_" + str(i)
@@ -126,9 +128,10 @@ else:
     
             for i in np.arange(1, len(questions) + 1, 1):
                 page_name = "Answer_" + str(i)
-                next_name = "Question_" + str(i+1)
-                if i == len(questions):
+                if i == int(len(questions)):
                     next_name = "EndPage"
+                else:
+                    next_name = "Question_" + str(i + 1)
                 back_name = "Question_" + str(i - 1)
                 frame = AnswerPage(parent=container, controller=self, next_name=next_name, back_name=back_name,
                                    title="Question " + str(i) + " of " + str(len(questions)), question=questions[i - 1],
@@ -157,6 +160,14 @@ else:
             button1.pack()
 
 
+    class EndPage(tk.Frame):
+        def __init__(self, parent, controller):
+            tk.Frame.__init__(self, parent)
+            self.controller = controller
+            label = tk.Label(self, text="End of Quiz", font=controller.title_font)
+            label.pack(side="top", fill="x", pady=10)
+
+
     class QuestionPage(tk.Frame):
 
         def __init__(self, parent, controller, back_name, next_name, title, question):
@@ -166,8 +177,8 @@ else:
             self.question = question
             title_label = tk.Label(self, text=title)
             title_label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
-            label = tk.Label(self, text=question, font=controller.title_font)
-            label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
+            question_label = tk.Label(self, text=question, font=controller.question_font)
+            question_label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
             back_button = tk.Button(self, text="Go back",
                                     command=lambda: controller.show_frame(back_name))
             next_button = tk.Button(self, text="Go To Answer",
@@ -187,22 +198,14 @@ else:
             self.answer = answer
             title_label = tk.Label(self, text=title)
             title_label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
-            label = tk.Label(self, text=question, font=controller.title_font)
-            label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
-            answer = tk.Label(self, text=answer, font=controller.title_font)
+            question_label = tk.Label(self, text=question, font=controller.question_font)
+            question_label.pack(side="top", fill="both", expand=True, padx=0, pady=0)
+            answer = tk.Label(self, text=answer, font=controller.answer_font)
             answer.pack(side="top", fill="both", expand=True, padx=0, pady=0)
             back_button = tk.Button(self, text="Go back",
                                     command=lambda: controller.show_frame(back_name))
-            next_button = tk.Button(self, text="Go Next Question",
+            next_button = tk.Button(self, text="Go To Next Question",
                                     command=lambda: controller.show_frame(next_name))
 
             back_button.pack(side="left", expand=True, padx=0, pady=0)
             next_button.pack(side="left", expand=True, padx=0, pady=0)
-
-
-    class EndPage(tk.Frame):
-        def __init__(self, parent, controller):
-            tk.Frame.__init__(self, parent)
-            self.controller = controller
-            label = tk.Label(self, text="Congratulations on completing the Quiz!", font=controller.title_font)
-            label.pack(side="top", fill="x", pady=10)
